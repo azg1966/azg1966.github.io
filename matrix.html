@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix 0.1</title>
+    <style>
+        body {
+            margin: auto;
+        }
+
+        #canvas-white,
+        #canvas-green {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas-green">Upgrade your browser</canvas>
+    <canvas id="canvas-white">Upgrade your browser</canvas>
+</body>
+<script>
+    const canvasWhite = document.getElementById('canvas-white');
+    const ctxWhite = canvasWhite.getContext('2d');
+    const canvasGreen = document.getElementById('canvas-green');
+    const ctxGreen = canvasGreen.getContext('2d');
+    const cw = canvasGreen.clientWidth;
+    const ch = canvasGreen.clientHeight;
+    canvasGreen.width = canvasWhite.width = cw;
+    canvasGreen.height = canvasWhite.height = ch;
+    let fontSize = 16
+    ctxGreen.fillStyle = '#000';
+    ctxGreen.fillRect(0, 0, canvasWhite.width, canvasWhite.height);
+    let animationTime = 0;
+    const columnWidth = fontSize / 1.4;
+    const points = Array(Math.floor(canvasWhite.width / columnWidth));
+    const initPoints = () => {
+        for (let i = 0; i < points.length; i++) {
+            points[i] = { y: 0, speed: 10 };
+        }
+    }
+    initPoints();
+
+    const choice = (arr) => {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+
+    const getRandomChar = () => {
+        // hiragana range 3041 - 3096
+        const j = ['3041', '3096'];
+        const l = ['21', '24f'];
+        const c = ['400', '4ff'];
+        // const g = ['3aa', '3ff'];
+        const r = choice([l, j, l, l, l, l]);
+        const rangeStart = parseInt(r[0], 16);
+        const rangeEnd = parseInt(r[1], 16);
+        const codePoint = rangeStart + Math.round(Math.random() * (rangeEnd - rangeStart));
+        return String.fromCodePoint(codePoint);
+    }
+    const clear = () => {
+        ctxGreen.fillStyle = 'rgba(0,0,0,.05)';
+        ctxGreen.fillRect(0, 0, cw, ch);
+        ctxWhite.clearRect(0, 0, cw, ch);
+    }
+    const draw = () => {
+        for (let i = 0; i < points.length; i++) {
+            // const text = String.fromCharCode(Math.random() * 128);
+            const text = getRandomChar();
+
+            const x = columnWidth * i;
+            const point = points[i];
+            ctxWhite.fillStyle = "rgba(255,255,255,0.9)";
+            ctxWhite.font = fontSize + "px monospace";
+
+            ctxWhite.fillText(text, x, point.y);
+
+
+            ctxGreen.fillStyle = "#0f0";
+            ctxGreen.shadowBlur = 7;
+            ctxGreen.shadowColor = '#0f7';
+            ctxGreen.font = fontSize + "px monospace";
+            ctxGreen.fillText(text, x, point.y);
+            ctxGreen.shadowColor = '#000';
+            ctxGreen.shadowBlur = 0;
+
+            if (point.y > 200 + Math.random() * 30000) {
+                point.y = 0;
+                point.speed = 5 + Math.random() * 15
+            }
+            else {
+                point.y += point.speed;
+            }
+        }
+    }
+    const loop = (time) => {
+        if (time - animationTime >= 40) {
+            animationTime = time;
+            clear();
+
+            draw();
+        }
+        requestAnimationFrame(loop);
+    };
+
+    requestAnimationFrame(loop);
+</script>
+
+</html>
